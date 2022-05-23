@@ -265,7 +265,6 @@ if (PLATFORM_WINDOWS)
         "${SRC_DIR}/video/windows/SDL_windowswindow.h"
         "${SRC_DIR}/video/windows/wmmsg.h"
     )
-endif()
 
 if (PSYDOOM_INCLUDE_VULKAN_RENDERER)
         list(APPEND SOURCE_FILES
