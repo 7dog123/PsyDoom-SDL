@@ -1,6 +1,5 @@
-set(BASE_DIR        "sdl2")
-set(SRC_DIR         "${BASE_DIR}/src")
-set(INCLUDE_DIR     "${BASE_DIR}/include")
+set(SRC_DIR         "src")
+set(INCLUDE_DIR     "include")
 
 set(INCLUDE_PATHS
     ${INCLUDE_DIR}
@@ -37,9 +36,11 @@ set(SOURCE_FILES
     "${INCLUDE_DIR}/SDL_keyboard.h"
     "${INCLUDE_DIR}/SDL_keycode.h"
     "${INCLUDE_DIR}/SDL_loadso.h"
+    "${INCLUDE_DIR}/SDL_locale.h"
     "${INCLUDE_DIR}/SDL_log.h"
     "${INCLUDE_DIR}/SDL_main.h"
     "${INCLUDE_DIR}/SDL_messagebox.h"
+    "${INCLUDE_DIR}/SDL_misc.h"
     "${INCLUDE_DIR}/SDL_mouse.h"
     "${INCLUDE_DIR}/SDL_mutex.h"
     "${INCLUDE_DIR}/SDL_name.h"
@@ -118,6 +119,12 @@ set(SOURCE_FILES
     "${SRC_DIR}/joystick/SDL_sysjoystick.h"
     "${SRC_DIR}/joystick/steam/SDL_steamcontroller.c"
     "${SRC_DIR}/joystick/steam/SDL_steamcontroller.h"
+    "${SRC_DIR}/joystick/windows/SDL_rawinputjoystick.c"
+    "${SRC_DIR}/joystick/windows/SDL_rawinputjoystick_c.h"
+    "${SRC_DIR}/locale/SDL_locale.c"
+    "${SRC_DIR}/locale/SDL_syslocale.h"
+    "${SRC_DIR}/misc/SDL_sysurl.h"
+    "${SRC_DIR}/misc/SDL_url.c"
     "${SRC_DIR}/render/opengl/SDL_glfuncs.h"
     "${SRC_DIR}/render/opengl/SDL_render_gl.c"
     "${SRC_DIR}/render/opengl/SDL_shaders_gl.c"
@@ -139,6 +146,7 @@ set(SOURCE_FILES
     "${SRC_DIR}/sensor/SDL_sensor.c"
     "${SRC_DIR}/sensor/SDL_sensor_c.h"
     "${SRC_DIR}/sensor/SDL_syssensor.h"
+    "${SRC_DIR}/stdlib/SDL_crc32.c"
     "${SRC_DIR}/stdlib/SDL_getenv.c"
     "${SRC_DIR}/stdlib/SDL_iconv.c"
     "${SRC_DIR}/stdlib/SDL_malloc.c"
@@ -208,6 +216,8 @@ if (PLATFORM_WINDOWS)
         "${SRC_DIR}/joystick/windows/SDL_xinputjoystick.c"
         "${SRC_DIR}/joystick/windows/SDL_xinputjoystick_c.h"
         "${SRC_DIR}/loadso/windows/SDL_sysloadso.c"
+        "${SRC_DIR}/locale/windows/SDL_syslocale.c"
+        "${SRC_DIR}/misc/windows/SDL_sysurl.c"
         "${SRC_DIR}/thread/generic/SDL_syscond.c"
         "${SRC_DIR}/thread/windows/SDL_sysmutex.c"
         "${SRC_DIR}/thread/windows/SDL_syssem.c"
@@ -255,8 +265,10 @@ if (PLATFORM_MAC)
         "${SRC_DIR}/filesystem/cocoa/SDL_sysfilesystem.m"
         "${SRC_DIR}/haptic/darwin/SDL_syshaptic.c"
         "${SRC_DIR}/haptic/darwin/SDL_syshaptic_c.h"
-        "${SRC_DIR}/joystick/darwin/SDL_sysjoystick.c"
-        "${SRC_DIR}/joystick/darwin/SDL_sysjoystick_c.h"
+        "${SRC_DIR}/joystick/darwin/SDL_iokitjoystick.c"
+        "${SRC_DIR}/joystick/darwin/SDL_iokitjoystick_c.h"
+        "${SRC_DIR}/locale/macosx/SDL_syslocale.m"
+        "${SRC_DIR}/misc/macosx/SDL_sysurl.m"
         "${SRC_DIR}/render/metal/SDL_render_metal.m"
         "${SRC_DIR}/render/metal/SDL_shaders_metal_osx.h"
         "${SRC_DIR}/thread/pthread/SDL_syscond.c"
@@ -294,8 +306,6 @@ if (PLATFORM_MAC)
     list(APPEND OTHER_FILES
         "${SRC_DIR}/render/metal/SDL_shaders_metal.metal"
     )
-
-    target_compile_definitions(${LIBSDL_TGT_NAME} PUBLIC -DSDL_VIDEO_METAL=1
 endif()
 
 if (PLATFORM_LINUX)
@@ -307,6 +317,8 @@ if (PLATFORM_LINUX)
         "${SRC_DIR}/core/linux/SDL_dbus.h"
         "${SRC_DIR}/core/linux/SDL_evdev.c"
         "${SRC_DIR}/core/linux/SDL_evdev.h"
+        "${SRC_DIR}/core/linux/SDL_evdev_capabilities.c"
+        "${SRC_DIR}/core/linux/SDL_evdev_capabilities.h"
         "${SRC_DIR}/core/linux/SDL_evdev_kbd.c"
         "${SRC_DIR}/core/linux/SDL_evdev_kbd.h"
         "${SRC_DIR}/core/linux/SDL_evdev_kbd_default_accents.h"
@@ -326,6 +338,8 @@ if (PLATFORM_LINUX)
         "${SRC_DIR}/haptic/linux/SDL_syshaptic.c"
         "${SRC_DIR}/joystick/linux/SDL_sysjoystick.c"
         "${SRC_DIR}/joystick/linux/SDL_sysjoystick_c.h"
+        "${SRC_DIR}/locale/unix/SDL_syslocale.c"
+        "${SRC_DIR}/misc/unix/SDL_sysurl.c"
         "${SRC_DIR}/thread/pthread/SDL_syscond.c"
         "${SRC_DIR}/thread/pthread/SDL_sysmutex.c"
         "${SRC_DIR}/thread/pthread/SDL_sysmutex_c.h"
@@ -383,6 +397,8 @@ target_compile_definitions(${LIBSDL_TGT_NAME} PUBLIC -DSDL_LEAN_AND_MEAN=1)
 
 if (PLATFORM_WINDOWS)
     target_compile_definitions(${LIBSDL_TGT_NAME} PUBLIC SDL_DISABLE_WINDOWS_IME)
+    target_compile_definitions(${LIBSDL_TGT_NAME} PUBLIC HAVE_LIBC)     # Use standard C math libraries etc.
+
     target_link_libraries(${LIBSDL_TGT_NAME}
         Imm32.lib
         User32.lib
@@ -415,6 +431,8 @@ if (PLATFORM_MAC)
         ${IO_KIT_FRAMEWORK}
         ${METAL_FRAMEWORK}
     )
+
+    target_compile_definitions(${LIBSDL_TGT_NAME} PUBLIC -DSDL_VIDEO_METAL=1)
 endif()
 
 if (PLATFORM_LINUX)
