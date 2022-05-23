@@ -1073,8 +1073,12 @@ IOS_MFIJoystickUpdate(SDL_Joystick *joystick)
             SDL_SetError("Couldn't start haptics engine");
             return nil;
         }
-
+   // PsyDoom: fix compile error "cannot create __weak reference in file using manual reference counting"
+    #if 1
+        typeof(self) weakSelf = self;
+    #else
         __weak typeof(self) weakSelf = self;
+    #endif
         self->engine.stoppedHandler = ^(CHHapticEngineStoppedReason stoppedReason) {
             SDL_RumbleMotor *_this = weakSelf;
             if (_this == nil) {
