@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.15)
+project(PsyDoom-SDL)
+
 set(SRC_DIR         "src")
 set(INCLUDE_DIR     "include")
 
